@@ -76,26 +76,26 @@ grid on;
 % | 2DOF Animation
 % +---------------------------------------------------------------------+
 animate = 1;
-
+width = 0.025;
 figure (2)
 if (animate == 1)
-    ax1 = 0-cos(X(:,2));
+    ax1 = -l1+cos(X(:,2));
     ay1 = X(:,1)-l1*X(:,2);
-    ax2 = 0+cos(X(:,2));
+    ax2 = l2+cos(X(:,2));
     ay2 = X(:,1)+l2*X(:,2);
+    cx1 = cos(X(:,2));
     cz = X(:,1);
-    h = plot([ax1(1),ax2(1)],[ay1(1),ay2(1)],'-k',[ax1(1), ax1(1)],[0,ay1(1)],'-r',[ax2(1), ax2(1)],[0,ay2(1)],'-r','LineWidth',3);
-    p = plot(ax1(1)+l1,cz(1),'-b');
+    h = plot([ax1(1),ax2(1)],[ay1(1),ay2(1)],'-k',[ax1(1), ax1(1)],[ay1(1),2],'-r',[ax2(1), ax2(1)],[ay2(1),2],'-r',[cx1(1)-width,cx1(1)+width],[cz(1)-width,cz(1)+width],'-b','LineWidth',3);
     xlabel('x, m')
-    ylabel('y, m')
+    ylabel('z, m')
     axis equal
     ylim([-0.5,2])
-    xlim([-2,2])
+    xlim([-2,3])
     for i = 2:length(ax1)
         set(h(1),'XData',[ax1(i),ax2(i)],'YData',[ay1(i),ay2(i)]);
-        set(h(2),'XData',[ax1(i),ax1(i)],'YData',[0,ay1(i)]);
-        set(h(3),'XData',[ax2(i),ax2(i)],'YData',[0,ay2(i)]);
-        %p = plot(ax1(i)+l1,cz(i),'-b');
+        set(h(2),'XData',[ax1(i),ax1(i)],'YData',[ay1(i),2]);
+        set(h(3),'XData',[ax2(i),ax2(i)],'YData',[ay2(i),2]);
+        set(h(4),'XData',[cx1(i)-width,cx1(i)+width],'YData',[cz(i)-width,cz(i)+width]);
         drawnow
         pause(1/30);
     end
@@ -120,23 +120,3 @@ function dXdt = two_DOF_forced_vibes(t, x, m, c, k, F0, omega)
     Fa(3:4,1) = m_inv*[F0*cos(omega*t); 0]; % Applied Force
     dXdt = temp*x + Fa;                     % Solution
 end
-
-
-
-
-
-
-
-
-%{
-syms J theta theta_ddot l_1 l_2 k_1 k_2 z m z_ddot
-
-d=8.04;%mm
-J=pi()*d^4/32; %solid cylinder shaft
-
-%EOMs
-eqn(1) = J*theta_ddot+(l_2*k_2-l_1*k_1)*z+(k_1*l_1^2+k_2*l_2^2)*theta==0;
-eqn(2) = m*z_ddot+k_1*(z-l_1*theta)+k_2*(z-l_2*theta)==0;
-
-z=solve(eqn,z); 
-%}
