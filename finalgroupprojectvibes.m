@@ -11,13 +11,15 @@ clc
 % | Inputs
 % +---------------------------------------------------------------------+
 m_b = 1;             % Mass in kg
-J = 1;               % Polar Moment in kg*m^2
+base = 0.2;
+height = 0.01;
+J = 1;%1/12*(base^4+height^4);  % Polar Moment in kg*m^2
 k1 = 1;              % Spring 1 Constant in N/m
 k2 = 1;              % Spring 2 Constant in N/m
 l1 = 2;              % Distance from CG in m
 l2 = 1;              % Distance from CG in m
 c = zeros(2,2);      % Damping Constant in Ns/m
-F_0 = 1;             % Excitation Force in N
+F_0 = [1;0];             % Excitation Force in N
 omega_0 = 0;         % Excitation Frequency in rad/s
 z_0 = 0;             % Initial Displacement in m
 theta_0 = 0;         % Initial Rotation in rad
@@ -55,8 +57,8 @@ K = transpose(psi)*k*psi; % Modal Stiffness Matrix
 %% [PLOTTING]
 % +---------------------------------------------------------------------+
 % | Plot the 2DOF Time History of X1 and X2
-% +---------------------------------------------------------------------+
-tspan = [0 20];   
+% +---------------------------------------------------------------------+  
+tspan =  [0 20];
 [t,X] = ode45(@(t,X) two_DOF_forced_vibes(t,X,m,c,k,F_0,omega_0), tspan, [x_i; v_i]);
 figure (1)
 yyaxis left
@@ -105,7 +107,7 @@ end
 % +---------------------------------------------------------------------+
 % | 2DOF Forced Harmonic Vibration
 % +---------------------------------------------------------------------+
-function dXdt = two_DOF_forced_vibes(t, x, m, c, k, F0, omega)
+function dXdt = two_DOF_forced_vibes(t, x, m, c, k, F_0, omega)
     % x(1): Displacement of Mass 1
     % x(2): Displacement of Mass 2    
     % x(3): Velocity of Mass 1
@@ -117,6 +119,17 @@ function dXdt = two_DOF_forced_vibes(t, x, m, c, k, F0, omega)
     temp(3:4, 1:2) = -m_inv*k;               
     temp(3:4, 3:4) = -m_inv*c;              
     Fa = zeros(4,1);                        % Preallocate
-    Fa(3:4,1) = m_inv*[F0*cos(omega*t); 0]; % Applied Force
+    Fa(3:4,1) = m_inv.*[F_0*cos(omega*t); 0]; % Applied Force
+    Fa_0(3:4,1) = m_inv*[0*cos(omega*t); 0]; % Applied Force
+    
+%{
+ if t==0
+        dXdt = temp*x + Fa;
+    else
+        dXdt = temp*x + Fa_0;
+    end 
+%}
+
+    
     dXdt = temp*x + Fa;                     % Solution
 end
