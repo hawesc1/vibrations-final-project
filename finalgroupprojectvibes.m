@@ -19,7 +19,7 @@ k2 = 1;              % Spring 2 Constant in N/m
 l1 = 2;              % Distance from CG in m
 l2 = 1;              % Distance from CG in m
 c = zeros(2,2);      % Damping Constant in Ns/m
-F_0 = [1;0];             % Excitation Force in N
+F_0 = 1;             % Excitation Force in N
 omega_0 = 0;         % Excitation Frequency in rad/s
 z_0 = 0;             % Initial Displacement in m
 theta_0 = 0;         % Initial Rotation in rad
@@ -119,7 +119,7 @@ function dXdt = two_DOF_forced_vibes(t, x, m, c, k, F_0, omega)
     temp(3:4, 1:2) = -m_inv*k;               
     temp(3:4, 3:4) = -m_inv*c;              
     Fa = zeros(4,1);                        % Preallocate
-    Fa(3:4,1) = m_inv.*[F_0*cos(omega*t); 0]; % Applied Force
+    Fa(3:4,1) = m_inv*[F_0*cos(omega*t); 0]; % Applied Force
     Fa_0(3:4,1) = m_inv*[0*cos(omega*t); 0]; % Applied Force
     
 %{
